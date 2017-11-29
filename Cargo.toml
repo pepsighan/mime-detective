@@ -1,0 +1,8 @@
+[package]
+name = "mime-detective"
+version = "0.1.0"
+authors = ["Sharad Chand <sharad.d.chand@gmail.com>"]
+
+[dependencies]
+magic = "0.12.2"
+mime = "0.3.5"
