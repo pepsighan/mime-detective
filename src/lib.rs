@@ -8,6 +8,8 @@ use magic::{Cookie, flags, MagicError};
 use std::path::Path;
 use std::{error, fmt};
 use mime::FromStrError;
+use std::fs::File;
+use std::io::{self, Read};
 
 pub struct MimeDetective {
     cookie: Cookie
@@ -22,10 +24,16 @@ impl MimeDetective {
         })
     }
 
-    pub fn detect_file<P: AsRef<Path>>(&self, filename: P) -> Result<mime::Mime, DetectiveError> {
+    pub fn detect_filepath<P: AsRef<Path>>(&self, filename: P) -> Result<mime::Mime, DetectiveError> {
         let mime_str = self.cookie.file(filename)?;
         let mime: mime::Mime = mime_str.parse()?;
         Ok(mime)
+    }
+
+    pub fn detect_file(&self, file: &mut File) -> Result<mime::Mime, DetectiveError> {
+        let mut buf: [u8; 2] = [0; 2];
+        file.read_exact(&mut buf)?;
+        self.detect_buffer(&buf)
     }
 
     pub fn detect_buffer(&self, buffer: &[u8]) -> Result<mime::Mime, DetectiveError> {
@@ -36,30 +44,31 @@ impl MimeDetective {
 
     #[cfg(feature = "rocket_data")]
     pub fn detect_data(&self, data: rocket::Data) -> Result<mime::Mime, DetectiveError> {
-        let mime_str = self.cookie.buffer(data.as_slice())?;
-        let mime: mime::Mime = mime_str.parse()?;
-        Ok(mime)
+        self.detect_buffer(data.peek())
     }
 }
 
 #[derive(Debug)]
 pub enum DetectiveError {
     Magic(MagicError),
-    Parse(FromStrError)
+    Parse(FromStrError),
+    IO(io::Error)
 }
 
 impl error::Error for DetectiveError {
     fn description(&self) -> &str {
         match *self {
             DetectiveError::Magic(ref err) => err.description(),
-            DetectiveError::Parse(ref err) => err.description()
+            DetectiveError::Parse(ref err) => err.description(),
+            DetectiveError::IO(ref err) => err.description()
         }
     }
 
     fn cause(&self) -> Option<&error::Error> {
         match *self {
             DetectiveError::Magic(ref err) => err.cause(),
-            DetectiveError::Parse(ref err) => err.cause()
+            DetectiveError::Parse(ref err) => err.cause(),
+            DetectiveError::IO(ref err) => err.cause()
         }
     }
 }
@@ -68,7 +77,8 @@ impl fmt::Display for DetectiveError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             DetectiveError::Magic(ref err) => write!(f, "MagicError: {}", err),
-            DetectiveError::Parse(ref err) => write!(f, "MimeParseError: {}", err)
+            DetectiveError::Parse(ref err) => write!(f, "MimeParseError: {}", err),
+            DetectiveError::IO(ref err) => write!(f, "IOError: {}", err)
         }
     }
 }
@@ -82,5 +92,52 @@ impl From<MagicError> for DetectiveError {
 impl From<FromStrError> for DetectiveError {
     fn from(err: FromStrError) -> Self {
         DetectiveError::Parse(err)
+    }
+}
+
+impl From<io::Error> for DetectiveError {
+    fn from(err: io::Error) -> Self {
+        DetectiveError::IO(err)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MimeDetective;
+    use mime;
+    use std::fs::File;
+    use std::io::Read;
+
+    fn init() -> MimeDetective {
+        MimeDetective::new().expect("mime db not found")
+    }
+
+    fn read_file() -> File {
+        File::open("Cargo.toml").unwrap()
+    }
+
+    #[test]
+    fn detect_filepath() {
+        let detective = init();
+        let mime = detective.detect_filepath("Cargo.toml").unwrap();
+        assert_eq!(mime::TEXT_PLAIN, mime);
+    }
+
+    #[test]
+    fn detect_file() {
+        let detective = init();
+        let mut file = read_file();
+        let mime = detective.detect_file(&mut file).unwrap();
+        assert_eq!(mime::TEXT_PLAIN, mime);
+    }
+
+    #[test]
+    fn detect_buffer() {
+        let detective = init();
+        let mut file = read_file();
+        let mut buf: [u8; 2] = [0; 2];
+        file.read_exact(&mut buf).unwrap();
+        let mime = detective.detect_buffer(&buf).unwrap();
+        assert_eq!(mime::TEXT_PLAIN, mime);
     }
 }
