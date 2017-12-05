@@ -43,7 +43,7 @@ impl MimeDetective {
     }
 
     #[cfg(feature = "rocket_data")]
-    pub fn detect_data(&self, data: rocket::Data) -> Result<mime::Mime, DetectiveError> {
+    pub fn detect_data(&self, data: &rocket::Data) -> Result<mime::Mime, DetectiveError> {
         self.detect_buffer(data.peek())
     }
 }
