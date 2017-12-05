@@ -1,8 +1,12 @@
 [package]
+authors = ["Sharad Chand <sharad.d.chand@gmail.com>"]
 name = "mime-detective"
 version = "0.1.0"
-authors = ["Sharad Chand <sharad.d.chand@gmail.com>"]
 
 [dependencies]
 magic = "0.12.2"
 mime = "0.3.5"
+rocket = { version = "0.3.3", optional = true }
+
+[features]
+rocket_data = ["rocket"]

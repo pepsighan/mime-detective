@@ -1,12 +1,15 @@
 extern crate mime;
 extern crate magic;
 
+#[cfg(feature = "rocket_data")]
+extern crate rocket;
+
 use magic::{Cookie, flags, MagicError};
 use std::path::Path;
 use std::{error, fmt};
 use mime::FromStrError;
 
-struct MimeDetective {
+pub struct MimeDetective {
     cookie: Cookie
 }
 
@@ -19,15 +22,28 @@ impl MimeDetective {
         })
     }
 
-    pub fn detect<P: AsRef<Path>>(&self, filename: P) -> Result<mime::Mime, DetectiveError> {
+    pub fn detect_file<P: AsRef<Path>>(&self, filename: P) -> Result<mime::Mime, DetectiveError> {
         let mime_str = self.cookie.file(filename)?;
+        let mime: mime::Mime = mime_str.parse()?;
+        Ok(mime)
+    }
+
+    pub fn detect_buffer(&self, buffer: &[u8]) -> Result<mime::Mime, DetectiveError> {
+        let mime_str = self.cookie.buffer(buffer)?;
+        let mime: mime::Mime = mime_str.parse()?;
+        Ok(mime)
+    }
+
+    #[cfg(feature = "rocket_data")]
+    pub fn detect_data(&self, data: rocket::Data) -> Result<mime::Mime, DetectiveError> {
+        let mime_str = self.cookie.buffer(data.as_slice())?;
         let mime: mime::Mime = mime_str.parse()?;
         Ok(mime)
     }
 }
 
 #[derive(Debug)]
-enum DetectiveError {
+pub enum DetectiveError {
     Magic(MagicError),
     Parse(FromStrError)
 }
