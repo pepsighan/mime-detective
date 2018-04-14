@@ -2,6 +2,12 @@
 authors = ["Sharad Chand <sharad.d.chand@gmail.com>"]
 name = "mime-detective"
 version = "0.1.2"
+description = "The `MimeDetective` spies for the magic number of a file or buffer and spits out strongly typed Mimes."
+license = "MIT"
+license-file = "./LICENSE.md"
+documentation = "https://docs.rs/mime-detective"
+homepage = "https://github.com/csharad/mime-detective"
+repository = "https://github.com/csharad/mime-detective"
 
 [dependencies]
 magic = "0.12.2"
