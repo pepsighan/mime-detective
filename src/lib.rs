@@ -13,9 +13,6 @@
 extern crate mime;
 extern crate magic;
 
-#[cfg(feature = "rocket_data")]
-extern crate rocket;
-
 use magic::{Cookie, flags, MagicError};
 use std::path::Path;
 use std::{error, fmt};
@@ -59,14 +56,6 @@ impl MimeDetective {
         let mime_str = self.cookie.buffer(buffer)?;
         let mime: mime::Mime = mime_str.parse()?;
         Ok(mime)
-    }
-
-    /// Detect Mime for rocket::Data.
-    ///
-    /// Use `features = ["rocket_data"]`
-    #[cfg(feature = "rocket_data")]
-    pub fn detect_data(&self, data: &rocket::Data) -> Result<mime::Mime, DetectiveError> {
-        self.detect_buffer(data.peek())
     }
 }
 

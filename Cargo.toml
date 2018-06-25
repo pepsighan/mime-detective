@@ -12,7 +12,3 @@ repository = "https://github.com/csharad/mime-detective"
 [dependencies]
 magic = "0.12.2"
 mime = "0.3.5"
-rocket = { version = "0.3.5", optional = true }
-
-[features]
-rocket_data = ["rocket"]
