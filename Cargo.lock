@@ -36,7 +36,7 @@ dependencies = [
 
 [[package]]
 name = "mime-detective"
-version = "0.1.2"
+version = "0.2.0"
 dependencies = [
  "magic 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "mime 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
