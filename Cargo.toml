@@ -11,4 +11,4 @@ edition = "2018"
 
 [dependencies]
 magic = "0.12.2"
-mime = "0.3.5"
+mime = "0.3.13"

@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "mime"
-version = "0.3.7"
+version = "0.3.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "unicase 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -39,7 +39,7 @@ name = "mime-detective"
 version = "0.2.1"
 dependencies = [
  "magic 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "mime 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mime 0.3.13 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -60,6 +60,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum libc 0.2.42 (registry+https://github.com/rust-lang/crates.io-index)" = "b685088df2b950fccadf07a7187c8ef846a959c142338a48f9dc0b94517eb5f1"
 "checksum magic 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)" = "96f74caec41a12630bb8fd9546530a41addb720eb0c10593855f59ce96a779aa"
 "checksum magic-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "17442cc60e34d501588c95bc976da04b6a87c51ab02370e95e1c2893a52df16c"
-"checksum mime 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "0b28683d0b09bbc20be1c9b3f6f24854efb1356ffcffee08ea3f6e65596e85fa"
+"checksum mime 0.3.13 (registry+https://github.com/rust-lang/crates.io-index)" = "3e27ca21f40a310bd06d9031785f4801710d566c184a6e15bad4f1d9b65f9425"
 "checksum unicase 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "284b6d3db520d67fbe88fd778c21510d1b0ba4a551e5d0fbb023d33405f6de8a"
 "checksum version_check 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)" = "6b772017e347561807c1aa192438c5fd74242a670a6cffacc40f2defd1dc069d"
