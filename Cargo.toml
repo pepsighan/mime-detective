@@ -7,6 +7,7 @@ license = "MIT"
 documentation = "https://docs.rs/mime-detective"
 homepage = "https://github.com/csharad/mime-detective"
 repository = "https://github.com/csharad/mime-detective"
+edition = "2018"
 
 [dependencies]
 magic = "0.12.2"

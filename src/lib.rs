@@ -10,19 +10,16 @@
 //! let mime = detective.detect_filepath("Cargo.toml").unwrap();
 //! ```
 
-extern crate mime;
-extern crate magic;
-
-use magic::{Cookie, flags, MagicError};
-use std::path::Path;
-use std::{error, fmt};
+use magic::{flags, Cookie, MagicError};
 use mime::FromStrError;
 use std::fs::File;
 use std::io::{self, Read};
+use std::path::Path;
+use std::{error, fmt};
 
 /// To detect the MimeType/ContentType using the magic library
 pub struct MimeDetective {
-    cookie: Cookie
+    cookie: Cookie,
 }
 
 impl MimeDetective {
@@ -32,13 +29,14 @@ impl MimeDetective {
     pub fn new() -> Result<MimeDetective, DetectiveError> {
         let cookie = Cookie::open(flags::MIME_TYPE)?;
         cookie.load(&["/usr/share/misc/magic.mgc"])?;
-        Ok(MimeDetective {
-            cookie
-        })
+        Ok(MimeDetective { cookie })
     }
 
     /// Detect Mime of a filepath
-    pub fn detect_filepath<P: AsRef<Path>>(&self, filename: P) -> Result<mime::Mime, DetectiveError> {
+    pub fn detect_filepath<P: AsRef<Path>>(
+        &self,
+        filename: P,
+    ) -> Result<mime::Mime, DetectiveError> {
         let mime_str = self.cookie.file(filename)?;
         let mime: mime::Mime = mime_str.parse()?;
         Ok(mime)
@@ -64,7 +62,7 @@ impl MimeDetective {
 pub enum DetectiveError {
     Magic(MagicError),
     Parse(FromStrError),
-    IO(io::Error)
+    IO(io::Error),
 }
 
 impl error::Error for DetectiveError {
@@ -72,7 +70,7 @@ impl error::Error for DetectiveError {
         match *self {
             DetectiveError::Magic(ref err) => err.description(),
             DetectiveError::Parse(ref err) => err.description(),
-            DetectiveError::IO(ref err) => err.description()
+            DetectiveError::IO(ref err) => err.description(),
         }
     }
 
@@ -80,7 +78,7 @@ impl error::Error for DetectiveError {
         match *self {
             DetectiveError::Magic(ref err) => err.cause(),
             DetectiveError::Parse(ref err) => err.cause(),
-            DetectiveError::IO(ref err) => err.cause()
+            DetectiveError::IO(ref err) => err.cause(),
         }
     }
 }
@@ -90,7 +88,7 @@ impl fmt::Display for DetectiveError {
         match *self {
             DetectiveError::Magic(ref err) => write!(f, "MagicError: {}", err),
             DetectiveError::Parse(ref err) => write!(f, "MimeParseError: {}", err),
-            DetectiveError::IO(ref err) => write!(f, "IOError: {}", err)
+            DetectiveError::IO(ref err) => write!(f, "IOError: {}", err),
         }
     }
 }
