@@ -17,7 +17,7 @@ use std::io::{self, Read};
 use std::path::Path;
 use std::{error, fmt};
 
-/// To detect the MimeType/ContentType using the magic library
+/// To detect the MimeType/ContentType using the magic library.
 pub struct MimeDetective {
     cookie: Cookie,
 }
@@ -25,14 +25,21 @@ pub struct MimeDetective {
 impl MimeDetective {
     /// Initialize detective with magic database from `/usr/share/misc/magic.mgc`.
     ///
-    /// Requires system to have libmagic installed
+    /// Requires system to have libmagic installed.
     pub fn new() -> Result<MimeDetective, DetectiveError> {
+        MimeDetective::load_databases(&["/usr/share/misc/magic.mgc"])
+    }
+
+    /// Initialize detective with magic databases available at the provided path.
+    /// 
+    /// Requires system to have libmagic installed.
+    pub fn load_databases<P: AsRef<Path>>(path: &[P]) -> Result<MimeDetective, DetectiveError> {
         let cookie = Cookie::open(flags::MIME_TYPE)?;
-        cookie.load(&["/usr/share/misc/magic.mgc"])?;
+        cookie.load(path)?;
         Ok(MimeDetective { cookie })
     }
 
-    /// Detect Mime of a filepath
+    /// Detect Mime of a filepath.
     pub fn detect_filepath<P: AsRef<Path>>(
         &self,
         filename: P,
@@ -42,14 +49,14 @@ impl MimeDetective {
         Ok(mime)
     }
 
-    /// Detect Mime of a file
+    /// Detect Mime of a file.
     pub fn detect_file(&self, file: &mut File) -> Result<mime::Mime, DetectiveError> {
         let mut buf: [u8; 2] = [0; 2];
         file.read_exact(&mut buf)?;
         self.detect_buffer(&buf)
     }
 
-    /// Detect Mime of a buffer
+    /// Detect Mime of a buffer.
     pub fn detect_buffer(&self, buffer: &[u8]) -> Result<mime::Mime, DetectiveError> {
         let mime_str = self.cookie.buffer(buffer)?;
         let mime: mime::Mime = mime_str.parse()?;
@@ -57,7 +64,7 @@ impl MimeDetective {
     }
 }
 
-/// Represents nested error of `magic` as well as parse and io errors
+/// Represents nested error of `magic` as well as parse and io errors.
 #[derive(Debug)]
 pub enum DetectiveError {
     Magic(MagicError),
