@@ -84,10 +84,10 @@ impl error::Error for DetectiveError {
 
 impl fmt::Display for DetectiveError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            DetectiveError::Magic(ref err) => write!(f, "MagicError: {}", err),
-            DetectiveError::Parse(ref err) => write!(f, "MimeParseError: {}", err),
-            DetectiveError::IO(ref err) => write!(f, "IOError: {}", err),
+        match self {
+            DetectiveError::Magic(err) => write!(f, "MagicError: {}", err),
+            DetectiveError::Parse(err) => write!(f, "MimeParseError: {}", err),
+            DetectiveError::IO(err) => write!(f, "IOError: {}", err),
         }
     }
 }
