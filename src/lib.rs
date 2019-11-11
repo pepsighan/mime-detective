@@ -31,7 +31,7 @@ impl MimeDetective {
     }
 
     /// Initialize detective with magic databases available at the provided path.
-    /// 
+    ///
     /// Requires system to have libmagic installed.
     pub fn load_databases<P: AsRef<Path>>(path: &[P]) -> Result<MimeDetective, DetectiveError> {
         let cookie = Cookie::open(flags::MIME_TYPE)?;
@@ -73,19 +73,11 @@ pub enum DetectiveError {
 }
 
 impl error::Error for DetectiveError {
-    fn description(&self) -> &str {
-        match *self {
-            DetectiveError::Magic(ref err) => err.description(),
-            DetectiveError::Parse(ref err) => err.description(),
-            DetectiveError::IO(ref err) => err.description(),
-        }
-    }
-
-    fn cause(&self) -> Option<&error::Error> {
-        match *self {
-            DetectiveError::Magic(ref err) => err.cause(),
-            DetectiveError::Parse(ref err) => err.cause(),
-            DetectiveError::IO(ref err) => err.cause(),
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            DetectiveError::Magic(err) => err.source(),
+            DetectiveError::Parse(err) => err.source(),
+            DetectiveError::IO(err) => err.source(),
         }
     }
 }
