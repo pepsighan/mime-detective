@@ -12,7 +12,7 @@
 
 use magic::{flags, Cookie, MagicError};
 use mime::FromStrError;
-use std::env::current_dir;
+use std::env::temp_dir;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
@@ -36,7 +36,7 @@ impl MimeDetective {
     fn magic_file() -> Result<PathBuf, DetectiveError> {
         let bytes = include_bytes!("../default_magic.mgc");
 
-        let magic_path = current_dir()?.join("magic.mgc");
+        let magic_path = temp_dir().join(".mime_detective_magic.mgc");
         let mut file = File::create(&magic_path)?;
         file.write_all(bytes)?;
 
