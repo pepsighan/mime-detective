@@ -12,9 +12,10 @@
 
 use magic::{flags, Cookie, MagicError};
 use mime::FromStrError;
+use std::env::temp_dir;
 use std::fs::File;
-use std::io::{self, Read};
-use std::path::Path;
+use std::io::{self, Read, Write};
+use std::path::{Path, PathBuf};
 use std::{error, fmt};
 
 /// To detect the MimeType/ContentType using the magic library.
@@ -23,15 +24,27 @@ pub struct MimeDetective {
 }
 
 impl MimeDetective {
-    /// Initialize detective with magic database from `/usr/share/misc/magic.mgc`.
+    /// Initialize detective with a default magic database.
     ///
     /// Requires system to have libmagic installed.
     pub fn new() -> Result<MimeDetective, DetectiveError> {
-        MimeDetective::load_databases(&["/usr/share/misc/magic.mgc"])
+        let path = Self::magic_file()?;
+        MimeDetective::load_databases(&[&path])
+    }
+
+    /// Creates a file out of embedded magic file.
+    fn magic_file() -> Result<PathBuf, DetectiveError> {
+        let bytes = include_bytes!("../default_magic.mgc");
+
+        let magic_path = temp_dir().join(".mime_detective_magic.mgc");
+        let mut file = File::create(&magic_path)?;
+        file.write_all(bytes)?;
+
+        Ok(magic_path)
     }
 
     /// Initialize detective with magic databases available at the provided path.
-    /// 
+    ///
     /// Requires system to have libmagic installed.
     pub fn load_databases<P: AsRef<Path>>(path: &[P]) -> Result<MimeDetective, DetectiveError> {
         let cookie = Cookie::open(flags::MIME_TYPE)?;
@@ -73,29 +86,21 @@ pub enum DetectiveError {
 }
 
 impl error::Error for DetectiveError {
-    fn description(&self) -> &str {
-        match *self {
-            DetectiveError::Magic(ref err) => err.description(),
-            DetectiveError::Parse(ref err) => err.description(),
-            DetectiveError::IO(ref err) => err.description(),
-        }
-    }
-
-    fn cause(&self) -> Option<&error::Error> {
-        match *self {
-            DetectiveError::Magic(ref err) => err.cause(),
-            DetectiveError::Parse(ref err) => err.cause(),
-            DetectiveError::IO(ref err) => err.cause(),
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            DetectiveError::Magic(err) => err.source(),
+            DetectiveError::Parse(err) => err.source(),
+            DetectiveError::IO(err) => err.source(),
         }
     }
 }
 
 impl fmt::Display for DetectiveError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            DetectiveError::Magic(ref err) => write!(f, "MagicError: {}", err),
-            DetectiveError::Parse(ref err) => write!(f, "MimeParseError: {}", err),
-            DetectiveError::IO(ref err) => write!(f, "IOError: {}", err),
+        match self {
+            DetectiveError::Magic(err) => write!(f, "MagicError: {}", err),
+            DetectiveError::Parse(err) => write!(f, "MimeParseError: {}", err),
+            DetectiveError::IO(err) => write!(f, "IOError: {}", err),
         }
     }
 }
