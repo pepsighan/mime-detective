@@ -4,6 +4,3 @@ Cargo.lock
 
 .idea
 *.iml
-
-# Test generated file
-magic.mgc
