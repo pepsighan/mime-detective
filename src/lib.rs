@@ -12,9 +12,10 @@
 
 use magic::{flags, Cookie, MagicError};
 use mime::FromStrError;
+use std::env::current_dir;
 use std::fs::File;
-use std::io::{self, Read};
-use std::path::Path;
+use std::io::{self, Read, Write};
+use std::path::{Path, PathBuf};
 use std::{error, fmt};
 
 /// To detect the MimeType/ContentType using the magic library.
@@ -23,11 +24,23 @@ pub struct MimeDetective {
 }
 
 impl MimeDetective {
-    /// Initialize detective with magic database from `/usr/share/misc/magic.mgc`.
+    /// Initialize detective with a default magic database.
     ///
     /// Requires system to have libmagic installed.
     pub fn new() -> Result<MimeDetective, DetectiveError> {
-        MimeDetective::load_databases(&["/usr/share/misc/magic.mgc"])
+        let path = Self::magic_file()?;
+        MimeDetective::load_databases(&[&path])
+    }
+
+    /// Creates a file out of embedded magic file.
+    fn magic_file() -> Result<PathBuf, DetectiveError> {
+        let bytes = include_bytes!("../default_magic.mgc");
+
+        let magic_path = current_dir()?.join("magic.mgc");
+        let mut file = File::create(&magic_path)?;
+        file.write_all(bytes)?;
+
+        Ok(magic_path)
     }
 
     /// Initialize detective with magic databases available at the provided path.
