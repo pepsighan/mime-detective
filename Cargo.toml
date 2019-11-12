@@ -1,7 +1,7 @@
 [package]
 authors = ["Sharad Chand <sharad.d.chand@gmail.com>"]
 name = "mime-detective"
-version = "0.2.2"
+version = "0.2.3"
 description = "The `MimeDetective` spies for the magic number of a file or buffer and spits out strongly typed Mimes."
 license = "MIT"
 documentation = "https://docs.rs/mime-detective"
