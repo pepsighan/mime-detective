@@ -1,3 +1,9 @@
+## [1.0.0] - 2020-01-20
+
+### Changed
+
+- Stabilized the crate.
+
 ## [0.2.3] - 2019-11-12
 
 ### Changed
